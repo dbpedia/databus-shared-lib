@@ -19,9 +19,12 @@
  */
 package org.dbpedia.databus
 
+import org.dbpedia.databus.shared.authentication.RSAModulusAndExponentValidationOps
+
 package object shared {
 
-  case class RSAModulusAndExponent(modulus: BigInt, exponent: BigInt) {
+  case class RSAModulusAndExponent(modulus: BigInt, exponent: BigInt)
+    extends RSAModulusAndExponentValidationOps {
 
     def modulusHex = modulus.toString(16).toUpperCase
 

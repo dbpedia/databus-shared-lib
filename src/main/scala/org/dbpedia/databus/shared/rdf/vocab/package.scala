@@ -27,6 +27,8 @@ package object vocab {
 
   def dcat = Dcat
 
+  def w3cCert = W3CCert
+
   trait DataIdVocab extends RDFNamespaceVocab {
 
     def namespace = "http://dataid.dbpedia.org/ns/core#"
@@ -62,6 +64,15 @@ package object vocab {
     lazy val mediaType = property("mediaType")
   }
 
+  trait W3CCertVocab extends RDFNamespaceVocab {
+
+    lazy val exponent = property("exponent")
+
+    lazy val key = property("key")
+
+    lazy val modulus = property("modulus")
+  }
+
   object DataId extends RDFNamespace with DataIdVocab {
 
     override def namespace: String = "http://dataid.dbpedia.org/ns/core#"
@@ -82,7 +93,6 @@ package object vocab {
 
     override def namespace: String = "http://www.w3.org/ns/dcat#"
 
-
     override def inModel(contextModel: Model) = {
 
       new RDFNamespaceInModel with DcatVocab {
@@ -90,6 +100,21 @@ package object vocab {
         override def model: Model = contextModel
 
         override def namespace: String = Dcat.namespace
+      }
+    }
+  }
+
+  object W3CCert extends RDFNamespace with W3CCertVocab {
+
+    override def namespace: String = "http://www.w3.org/ns/auth/cert#"
+
+    override def inModel(contextModel: Model) = {
+
+      new RDFNamespaceInModel with W3CCertVocab {
+
+        override def model: Model = contextModel
+
+        override def namespace: String = W3CCert.namespace
       }
     }
   }
