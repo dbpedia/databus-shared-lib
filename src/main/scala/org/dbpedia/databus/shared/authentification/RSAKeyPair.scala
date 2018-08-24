@@ -17,21 +17,14 @@
  * limitations under the License.
  * #L%
  */
-package org.dbpedia.databus
+package org.dbpedia.databus.shared.authentification
 
-import org.dbpedia.databus.shared.authentication.RSAModulusAndExponentValidationOps
+import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
 
-package object shared {
+case class RSAKeyPair(publicKey: RSAPublicKey, privateKey: RSAPrivateKey) {
 
-  case class RSAModulusAndExponent(modulus: BigInt, exponent: BigInt)
-    extends RSAModulusAndExponentValidationOps {
+  def publicModulusAndExponent = {
 
-    def modulusHex = modulus.toString(16).toUpperCase
-
-    def shortenedDescription =
-      s"""
-         |modulus:  ${modulusHex.take(30)}...
-         |exponent: $exponent
-       """.stripMargin
+    RSAModulusAndExponent(publicKey.getPublicExponent, publicKey.getModulus)
   }
 }
