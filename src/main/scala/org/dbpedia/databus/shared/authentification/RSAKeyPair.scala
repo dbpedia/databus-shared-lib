@@ -25,6 +25,6 @@ case class RSAKeyPair(publicKey: RSAPublicKey, privateKey: RSAPrivateKey) {
 
   def publicModulusAndExponent = {
 
-    RSAModulusAndExponent(publicKey.getPublicExponent, publicKey.getModulus)
+    RSAModulusAndExponent(publicKey.getModulus, publicKey.getPublicExponent)
   }
 }
