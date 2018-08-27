@@ -29,6 +29,9 @@ import resource._
 import scalaz._
 import Scalaz._
 
+import scala.collection.JavaConverters._
+import scala.language.postfixOps
+
 import java.security.KeyStore
 import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
 
@@ -63,15 +66,17 @@ case class PKCS12File(file: File, password: String = "") extends LazyLogging {
 
   lazy val keyManagers = keyManagerArray.toList
 
-  lazy val rsaKeyPairs = {
+  lazy val certificatesAndKeyPairs = {
 
-    val nestedContainers = keyManagers collect { case x509: X509KeyManager =>
+    keyManagers collect { case x509: X509KeyManager =>
 
       val aliases = x509.getClientAliases("RSA", null)
 
       aliases map { alias =>
 
-        def publicKey = x509.getCertificateChain(alias).head.getPublicKey match {
+        val clientCert = x509.getCertificateChain(alias).head
+
+        def publicKey = clientCert.getPublicKey match {
 
           case rsa: RSAPublicKey => rsa.some
 
@@ -91,11 +96,22 @@ case class PKCS12File(file: File, password: String = "") extends LazyLogging {
           }
         }
 
-        (publicKey |@| privateKey) apply (RSAKeyPair)
+        (clientCert, (publicKey |@| privateKey) apply (RSAKeyPair))
       }
-    }
+    } flatten
+  }
 
-    nestedContainers.flatten.flatten.toList
+  lazy val certificates = certificatesAndKeyPairs map { case (cert,_) => cert }
+
+  lazy val rsaKeyPairs = certificatesAndKeyPairs collect { case (_, Some(keyPair)) => keyPair }
+
+  lazy val uriAlternativeNames = certificates map { cert =>
+
+    cert.getSubjectAlternativeNames.asScala.map(_.asScala.toList).collect { case 6 :: (iriAltName: String) :: Nil =>
+
+      iriAltName
+
+    } toList
   }
 
   def findMatchingKeyPair(modExp: RSAModulusAndExponent) = {

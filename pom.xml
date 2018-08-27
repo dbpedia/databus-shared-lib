@@ -95,6 +95,12 @@
             <artifactId>scala-logging_${scala.compat.version}</artifactId>
             <version>3.9.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.compat.version}</artifactId>
+            <version>3.0.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <distributionManagement>
