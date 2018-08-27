@@ -19,12 +19,16 @@
  */
 package org.dbpedia.databus.shared
 
+import org.dbpedia.databus.shared.helpers.conversions.TapableW
+
 import better.files.File
 import cats.effect.IO
 import com.google.common.hash.{Hasher, Hashing}
 import com.typesafe.scalalogging.LazyLogging
 import fs2.io
 
+import java.io.InputStream
+import java.security.{PrivateKey, PublicKey, Signature}
 import java.util.concurrent.atomic.AtomicInteger
 
 package object signing extends LazyLogging {
@@ -46,4 +50,51 @@ package object signing extends LazyLogging {
   }
 
   def sha256Hash(file: File) = hashFile(file, Hashing.sha256().newHasher())
+
+  def signFile(privateKey: PrivateKey, file: File, algorithmName: String = "SHA1withRSA",
+    bufferSize: Int = bufferSizeCrypt): Array[Byte] = {
+
+    sign(privateKey, io.file.readAll[IO](file.path, bufferSize), algorithmName)
+  }
+
+  def signInputStream(privateKey: PrivateKey, data: InputStream, algorithmName: String = "SHA1withRSA",
+    bufferSize: Int = bufferSizeCrypt): Array[Byte] = {
+
+    sign(privateKey, io.readInputStream(IO(data), bufferSize), algorithmName)
+  }
+
+  def sign(privateKey: PrivateKey, dataStream: fs2.Stream[IO, Byte],
+    algorithmName: String = "SHA1withRSA"): Array[Byte] = {
+
+    def signatureForSign = Signature.getInstance(algorithmName) tap { _ initSign privateKey }
+
+    dataStream.chunks.compile.fold(signatureForSign)({
+
+      case (sig, bytes) => sig tap { _.update(bytes.toArray) }
+    }).unsafeRunSync().sign()
+  }
+
+  def verifyFile(publicKey: PublicKey, signature: Array[Byte], file: File, algorithmName: String = "SHA1withRSA",
+    bufferSize: Int = bufferSizeCrypt): Boolean = {
+
+    verify(publicKey, signature, io.file.readAll[IO](file.path, bufferSize), algorithmName)
+  }
+
+  def verifyInputStream(publicKey: PublicKey, signature: Array[Byte], data: InputStream,
+    algorithmName: String = "SHA1withRSA", bufferSize: Int = bufferSizeCrypt): Boolean = {
+
+    verify(publicKey, signature, io.readInputStream(IO(data), bufferSize), algorithmName)
+  }
+
+
+  def verify(publicKey: PublicKey, signature: Array[Byte] ,dataStream: fs2.Stream[IO, Byte],
+    algorithmName: String = "SHA1withRSA"): Boolean = {
+
+    def signatureForVerify = Signature.getInstance(algorithmName) tap { _ initVerify publicKey }
+
+    dataStream.chunks.compile.fold(signatureForVerify)({
+
+      case (sig, bytes) => sig tap { _.update(bytes.toArray) }
+    }).unsafeRunSync().verify(signature)
+  }
 }

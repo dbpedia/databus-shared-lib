@@ -27,7 +27,6 @@ import fs2.io
 import resource.managed
 
 
-
 package object helpers {
 
   def contextClassLoader = Thread.currentThread().getContextClassLoader()
@@ -76,7 +75,7 @@ package object helpers {
 
           resourceAsStream(name, classLoader) apply { is =>
 
-            io.readInputStream[IO](IO(is), 32 * 1024)
+            io.readInputStream(IO(is), 32 * 1024)
               .through(io.file.writeAll(sink.path)).compile.drain.unsafeRunSync()
           }
         }
