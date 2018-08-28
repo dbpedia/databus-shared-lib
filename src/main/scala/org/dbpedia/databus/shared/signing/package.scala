@@ -23,7 +23,7 @@ import org.dbpedia.databus.shared.helpers.conversions.TapableW
 
 import better.files.File
 import cats.effect.IO
-import com.google.common.hash.{Hasher, Hashing}
+import com.google.common.hash.{HashCode, HashFunction, Hasher, Hashing}
 import com.typesafe.scalalogging.LazyLogging
 import fs2.io
 
@@ -37,19 +37,26 @@ package object signing extends LazyLogging {
 
   var bufferSizeHash = 32 * 1024
 
-  def hashFile(file: File, hasher: Hasher) = {
+  def hashFile(file: File, hashFunction: HashFunction, bufferSize: Int = bufferSizeHash): HashCode = {
 
-    val chunkCounter = new AtomicInteger()
+    hash(io.file.readAll[IO](file.path, bufferSize), hashFunction)
+  }
 
-    io.file.readAll[IO](file.path, bufferSizeHash).chunks
-      .compile.fold(hasher)({ case (hasher, byteChunk) => {
-      chunkCounter.incrementAndGet()
+  def hashInputStream(data: InputStream, hashFunction: HashFunction, bufferSize: Int = bufferSizeHash) = {
+
+    hash(io.readInputStream(IO(data), bufferSize), hashFunction)
+  }
+
+  def hash(dataStream: fs2.Stream[IO, Byte], hashFunction: HashFunction): HashCode = {
+
+    dataStream.chunks
+      .compile.fold(hashFunction.newHasher())({ case (hasher, byteChunk) => {
       hasher.putBytes(byteChunk.toArray)
     }
     }).unsafeRunSync().hash()
   }
 
-  def sha256Hash(file: File) = hashFile(file, Hashing.sha256().newHasher())
+  def sha256Hash(file: File) = hashFile(file, Hashing.sha256())
 
   def signFile(privateKey: PrivateKey, file: File, algorithmName: String = "SHA1withRSA",
     bufferSize: Int = bufferSizeCrypt): Array[Byte] = {
@@ -66,11 +73,15 @@ package object signing extends LazyLogging {
   def sign(privateKey: PrivateKey, dataStream: fs2.Stream[IO, Byte],
     algorithmName: String = "SHA1withRSA"): Array[Byte] = {
 
-    def signatureForSign = Signature.getInstance(algorithmName) tap { _ initSign privateKey }
+    def signatureForSign = Signature.getInstance(algorithmName) tap {
+      _ initSign privateKey
+    }
 
     dataStream.chunks.compile.fold(signatureForSign)({
 
-      case (sig, bytes) => sig tap { _.update(bytes.toArray) }
+      case (sig, bytes) => sig tap {
+        _.update(bytes.toArray)
+      }
     }).unsafeRunSync().sign()
   }
 
@@ -86,15 +97,18 @@ package object signing extends LazyLogging {
     verify(publicKey, signature, io.readInputStream(IO(data), bufferSize), algorithmName)
   }
 
-
-  def verify(publicKey: PublicKey, signature: Array[Byte] ,dataStream: fs2.Stream[IO, Byte],
+  def verify(publicKey: PublicKey, signature: Array[Byte], dataStream: fs2.Stream[IO, Byte],
     algorithmName: String = "SHA1withRSA"): Boolean = {
 
-    def signatureForVerify = Signature.getInstance(algorithmName) tap { _ initVerify publicKey }
+    def signatureForVerify = Signature.getInstance(algorithmName) tap {
+      _ initVerify publicKey
+    }
 
     dataStream.chunks.compile.fold(signatureForVerify)({
 
-      case (sig, bytes) => sig tap { _.update(bytes.toArray) }
+      case (sig, bytes) => sig tap {
+        _.update(bytes.toArray)
+      }
     }).unsafeRunSync().verify(signature)
   }
 }
