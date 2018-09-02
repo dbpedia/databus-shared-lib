@@ -23,9 +23,13 @@ package object errors {
 
   trait DatabusError extends Exception
 
+  class UnexpectedIriFormatError(msg: String) extends Exception(msg) with DatabusError
+
   class UnexpectedRdfFormatError(msg: String) extends Exception(msg) with DatabusError
 
   class UnexpectedDataIdFormatError(msg: String) extends UnexpectedRdfFormatError(msg)
+
+  def unexpectedIriFormat(msg: String) = new UnexpectedRdfFormatError(msg)
 
   def unexpectedRdfFormat(msg: String) = new UnexpectedRdfFormatError(msg)
 

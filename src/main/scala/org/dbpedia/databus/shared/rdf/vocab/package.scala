@@ -23,15 +23,34 @@ import org.apache.jena.rdf.model.Model
 
 package object vocab {
 
-  def dataid = DataId
+  object global {
 
-  def dcat = Dcat
+    def dataid = DataId
 
-  def w3cCert = W3CCert
+    def dcat = Dcat
+
+    def dcterms = DCTerms
+
+    def schemaOrg = SchemaOrg
+
+    def w3cCert = W3CCert
+  }
+
+  def dataid(implicit model: Model) = DataId.inModel(model)
+
+  def dcat(implicit model: Model) = Dcat.inModel(model)
+
+  def dcterms(implicit model: Model) = DCTerms.inModel(model)
+
+  def schemaOrg(implicit  model: Model) = SchemaOrg.inModel(model)
+
+  def w3cCert(implicit model: Model) = W3CCert.inModel(model)
 
   trait DataIdVocab extends RDFNamespaceVocab {
 
     def namespace = "http://dataid.dbpedia.org/ns/core#"
+
+    lazy val DataId = resource("DataId")
 
     lazy val Dataset = resource("Dataset")
 
@@ -55,6 +74,8 @@ package object vocab {
 
   trait DcatVocab extends RDFNamespaceVocab {
 
+    def namespace: String = "http://www.w3.org/ns/dcat#"
+
     lazy val byteSize = property("byteSize")
 
     lazy val distribution = property("distribution")
@@ -64,7 +85,29 @@ package object vocab {
     lazy val mediaType = property("mediaType")
   }
 
+  trait DCTermsVocab extends RDFNamespaceVocab {
+
+    def namespace: String = "http://purl.org/dc/terms/"
+
+    lazy val identifier = property("identifier")
+
+    lazy val issued = property("issued")
+
+    lazy val modified = property("modified")
+  }
+
+  trait SchemaOrgVocab extends RDFNamespaceVocab {
+
+    override def namespace: String = "http://schema.org/version"
+
+    lazy val version = property("version")
+  }
+
   trait W3CCertVocab extends RDFNamespaceVocab {
+
+    def namespace: String = "http://www.w3.org/ns/auth/cert#"
+
+    lazy val RSAPublicKey = resource("RSAPublicKey")
 
     lazy val exponent = property("exponent")
 
@@ -75,46 +118,55 @@ package object vocab {
 
   object DataId extends RDFNamespace with DataIdVocab {
 
-    override def namespace: String = "http://dataid.dbpedia.org/ns/core#"
-
-
     override def inModel(contextModel: Model) = {
 
       new RDFNamespaceInModel with DataIdVocab {
 
         override def model: Model = contextModel
-
-        override def namespace: String = DataId.namespace
       }
     }
   }
 
   object Dcat extends RDFNamespace with DcatVocab {
 
-    override def namespace: String = "http://www.w3.org/ns/dcat#"
-
     override def inModel(contextModel: Model) = {
 
       new RDFNamespaceInModel with DcatVocab {
 
         override def model: Model = contextModel
+      }
+    }
+  }
 
-        override def namespace: String = Dcat.namespace
+  object DCTerms extends RDFNamespace with DCTermsVocab {
+
+    override def inModel(contextModel: Model) = {
+
+      new RDFNamespaceInModel with DCTermsVocab {
+
+        override def model: Model = contextModel
+      }
+    }
+  }
+
+  object SchemaOrg extends RDFNamespace with SchemaOrgVocab {
+
+    override def inModel(contextModel: Model) = {
+
+      new RDFNamespaceInModel with SchemaOrgVocab {
+
+        override def model: Model = contextModel
       }
     }
   }
 
   object W3CCert extends RDFNamespace with W3CCertVocab {
 
-    override def namespace: String = "http://www.w3.org/ns/auth/cert#"
-
     override def inModel(contextModel: Model) = {
 
       new RDFNamespaceInModel with W3CCertVocab {
 
         override def model: Model = contextModel
-
-        override def namespace: String = W3CCert.namespace
       }
     }
   }

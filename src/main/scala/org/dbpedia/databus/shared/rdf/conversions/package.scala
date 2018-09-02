@@ -21,7 +21,9 @@ package org.dbpedia.databus.shared.rdf
 
 import org.dbpedia.databus.shared.errors
 
+import org.apache.jena.iri.IRIFactory
 import org.apache.jena.rdf.model._
+import org.apache.jena.vocabulary.RDF
 
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
@@ -41,6 +43,27 @@ package object conversions {
 
         case _ => throw errorGen(s"several ${prop.getURI} values for $res")
       }
+    }
+
+    def hasType(rdfType: Resource) = {
+
+      res.listProperties(RDF.`type`).asScala.exists(_.getObject == rdfType)
+    }
+  }
+
+  implicit class StringJenaW(val str: String) extends AnyVal {
+
+    def asIRI(implicit model: Model) = model.createResource(str)
+
+    def asAbsoluteIRI(implicit model: Model) = {
+
+      Try(IRIFactory.iriImplementation().construct(str)).flatMap({
+
+        case absolute if absolute.isAbsolute => Success(model.createResource(str))
+
+        case notAbsolute => Failure(errors.unexpectedIriFormat(
+          s"'$notAbsolute' does not denote an absolute IRI"))
+      }).get
     }
   }
 
