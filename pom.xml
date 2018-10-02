@@ -4,7 +4,7 @@
     <groupId>org.dbpedia.databus</groupId>
     <artifactId>databus-shared-lib</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.6</version>
+    <version>0.2</version>
     <name>${project.artifactId}</name>
 
     <url>http://maven.apache.org</url>
@@ -89,6 +89,11 @@
             <groupId>co.fs2</groupId>
             <artifactId>fs2-io_${scala.compat.version}</artifactId>
             <version>${fs2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scalaj</groupId>
+            <artifactId>scalaj-http_${scala.compat.version}</artifactId>
+            <version>2.4.1</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.scala-logging</groupId>

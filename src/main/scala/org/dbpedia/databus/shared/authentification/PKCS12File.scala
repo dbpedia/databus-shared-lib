@@ -25,13 +25,13 @@ import better.files.File
 import com.typesafe.scalalogging.LazyLogging
 import javax.net.ssl.{KeyManagerFactory, X509KeyManager}
 import resource._
-
+import scalaz.Scalaz._
 import scalaz._
-import Scalaz._
 
 import scala.collection.JavaConverters._
 import scala.language.postfixOps
 
+import java.io.InputStream
 import java.security.KeyStore
 import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
 
@@ -45,9 +45,23 @@ import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
   * @param password
   */
 
-case class PKCS12File(file: File, password: String = "") extends LazyLogging {
+object PKCS12File {
 
-  lazy val keyStore = managed(file.newInputStream) apply { is =>
+  def apply(pkcs12File: File, password: String = ""): PKCS12File = {
+
+    new PKCS12File(managed(pkcs12File.newInputStream), pkcs12File.pathAsString, password)
+  }
+
+  def fromStream(pkcs12Stream: ManagedResource[InputStream], sourceDesc: String, password: String = ""): PKCS12File = {
+
+    new PKCS12File(pkcs12Stream, sourceDesc, password)
+  }
+}
+
+class PKCS12File(pkcs12Stream: ManagedResource[InputStream], sourceDesc: String, password: String = "")
+  extends LazyLogging {
+
+  lazy val keyStore = pkcs12Stream apply { is =>
 
     KeyStore.getInstance("PKCS12").tap {
 
@@ -81,7 +95,7 @@ case class PKCS12File(file: File, password: String = "") extends LazyLogging {
           case rsa: RSAPublicKey => rsa.some
 
           case _ => {
-            logger.warn(s"encountered non-RSA public key in PKCS12 file ${file.pathAsString}")
+            logger.warn(s"encountered non-RSA public key in PKCS12 data from $sourceDesc")
             None
           }
         }
@@ -91,7 +105,7 @@ case class PKCS12File(file: File, password: String = "") extends LazyLogging {
           case rsa: RSAPrivateKey => rsa.some
 
           case _ => {
-            logger.warn(s"encountered non-RSA private key in PKCS12 file ${file.pathAsString}")
+            logger.warn(s"encountered non-RSA private key in PKCS12 data from $sourceDesc")
             None
           }
         }
