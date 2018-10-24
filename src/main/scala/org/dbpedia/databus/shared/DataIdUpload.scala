@@ -26,7 +26,7 @@ import com.typesafe.scalalogging.LazyLogging
 import resource._
 import scalaj.http.{HttpResponse, MultiPart}
 
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, InputStream}
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -36,6 +36,13 @@ object DataIdUpload extends LazyLogging {
     allowOverwrite: Boolean): HttpResponse[String] = {
 
     upload(uploadEndpointIRI, managed(dataIdFile.newInputStream), managed(pkcs12File.newInputStream),
+      pkcs12File.pathAsString, dataIdTargetLocation, allowOverwrite)
+  }
+
+  def upload(uploadEndpointIRI: String, dataIdBytes: Array[Byte], pkcs12File: File, dataIdTargetLocation: String,
+    allowOverwrite: Boolean): HttpResponse[String] = {
+
+    upload(uploadEndpointIRI, managed(new ByteArrayInputStream(dataIdBytes)), managed(pkcs12File.newInputStream),
       pkcs12File.pathAsString, dataIdTargetLocation, allowOverwrite)
   }
 
@@ -57,7 +64,7 @@ object DataIdUpload extends LazyLogging {
         val RSAKeyPair(publicKey, privateKey) = pkcs12.rsaKeyPairs.head
 
         def dataIdPart = MultiPart(UploadPartNames.dataId, "dataid.ttl", "text/turtle", dataIdForSend, dataIdSize,
-          bytesWritten => logger.debug(s"$bytesWritten bytes written"))
+          bytesWritten => logger.debug(s"$bytesWritten bytes written for $dataIdTargetLocation"))
 
         def signaturePart = MultiPart(UploadPartNames.dataIdSignature, "dataid.ttl.sig", "application/pkcs7-signature",
           signing.signInputStream(privateKey, dataIdForSign))
