@@ -4,7 +4,7 @@
     <groupId>org.dbpedia.databus</groupId>
     <artifactId>databus-shared-lib</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <name>${project.artifactId}</name>
 
     <url>http://maven.apache.org</url>
@@ -50,20 +50,20 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
-            <version>3.8.0</version>
+            <version>3.9.0</version>
             <type>pom</type>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.17</version>
+            <version>1.18</version>
         </dependency>
         <!-- for better file and resource handling -->
         <dependency>
             <groupId>com.github.pathikrit</groupId>
             <artifactId>better-files_${scala.compat.version}</artifactId>
-            <version>3.5.0</version>
+            <version>3.6.0</version>
         </dependency>
         <dependency>
             <groupId>com.jsuereth</groupId>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>26.0-jre</version>
+            <version>27.0-jre</version>
         </dependency>
         <dependency>
             <groupId>org.scalaz</groupId>
@@ -188,6 +188,11 @@
                         <dependencyConvergence/>
                     </rules>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.7</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

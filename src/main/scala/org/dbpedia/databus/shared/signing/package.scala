@@ -49,8 +49,7 @@ package object signing extends LazyLogging {
 
   def hash(dataStream: fs2.Stream[IO, Byte], hashFunction: HashFunction): HashCode = {
 
-    dataStream.chunks
-      .compile.fold(hashFunction.newHasher())({ case (hasher, byteChunk) => {
+    dataStream.chunks.compile.fold(hashFunction.newHasher())({ case (hasher, byteChunk) => {
       hasher.putBytes(byteChunk.toArray)
     }
     }).unsafeRunSync().hash()
