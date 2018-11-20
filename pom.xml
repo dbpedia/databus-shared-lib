@@ -4,7 +4,7 @@
     <groupId>org.dbpedia.databus</groupId>
     <artifactId>databus-shared-lib</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.2</version>
+    <version>0.2.3</version>
     <name>${project.artifactId}</name>
 
     <url>http://maven.apache.org</url>

@@ -31,6 +31,8 @@ package object vocab {
 
     def dcterms = DCTerms
 
+    def foaf = Foaf
+
     def schemaOrg = SchemaOrg
 
     def w3cCert = W3CCert
@@ -41,6 +43,8 @@ package object vocab {
   def dcat(implicit model: Model) = Dcat.inModel(model)
 
   def dcterms(implicit model: Model) = DCTerms.inModel(model)
+
+  def foaf(implicit model: Model) = Foaf.inModel(model)
 
   def schemaOrg(implicit  model: Model) = SchemaOrg.inModel(model)
 
@@ -56,8 +60,12 @@ package object vocab {
 
     lazy val SingleFile = resource("SingleFile")
 
+    lazy val artifact = property("artifact")
+    
     lazy val associatedAgent = property("associatedAgent")
 
+    lazy val bundle = property("bundle")
+    
     lazy val compression = property("compression")
 
     lazy val isDistributionOf = property("isDistributionOf")
@@ -70,6 +78,7 @@ package object vocab {
 
     lazy val signature = property("signature")
 
+    lazy val uncompressedByteSize = property("uncompressedByteSize")
   }
 
   trait DcatVocab extends RDFNamespaceVocab {
@@ -89,11 +98,30 @@ package object vocab {
 
     def namespace: String = "http://purl.org/dc/terms/"
 
+    lazy val conformsTo = property("conformsTo")
+
+    lazy val description = property("description")
+
+    lazy val hasVersion = property("hasVersion")
+
     lazy val identifier = property("identifier")
 
     lazy val issued = property("issued")
 
+    lazy val license = property("license")
+
     lazy val modified = property("modified")
+
+    lazy val publisher = property("publisher")
+
+    lazy val title = property("title")
+  }
+
+  trait FoafVocab extends RDFNamespaceVocab {
+
+    override def namespace: String = "http://xmlns.com/foaf/0.1/"
+
+    lazy val account = property("account")
   }
 
   trait SchemaOrgVocab extends RDFNamespaceVocab {
@@ -143,6 +171,17 @@ package object vocab {
     override def inModel(contextModel: Model) = {
 
       new RDFNamespaceInModel with DCTermsVocab {
+
+        override def model: Model = contextModel
+      }
+    }
+  }
+
+  object Foaf extends RDFNamespace with FoafVocab {
+
+    override def inModel(contextModel: Model) = {
+
+      new RDFNamespaceInModel with FoafVocab {
 
         override def model: Model = contextModel
       }

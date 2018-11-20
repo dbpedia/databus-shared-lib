@@ -21,6 +21,7 @@ package org.dbpedia.databus.shared.rdf
 
 import org.dbpedia.databus.shared.errors
 
+import org.apache.jena.datatypes.RDFDatatype
 import org.apache.jena.iri.IRIFactory
 import org.apache.jena.rdf.model._
 import org.apache.jena.vocabulary.RDF
@@ -64,6 +65,18 @@ package object conversions {
         case notAbsolute => Failure(errors.unexpectedIriFormat(
           s"'$notAbsolute' does not denote an absolute IRI"))
       }).get
+    }
+
+    def asPlainLiteral(implicit model: Model) = {
+      model.createLiteral(str)
+    }
+
+    def asLangLiteral(langTag: String)(implicit model: Model) = {
+      model.createLiteral(str, langTag)
+    }
+
+    def asTypedLiteral(dtype: RDFDatatype)(implicit model: Model) = {
+      model.createTypedLiteral(str, dtype)
     }
   }
 
