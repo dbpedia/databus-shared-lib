@@ -32,22 +32,22 @@ import java.nio.charset.StandardCharsets
 
 object DataIdUpload extends LazyLogging {
 
-  def upload(uploadEndpointIRI: String, dataIdFile: File, pkcs12File: File, dataIdTargetLocation: String,
-    allowOverwrite: Boolean): HttpResponse[String] = {
+  def upload(uploadEndpointIRI: String, dataIdFile: File, pkcs12File: File, pkcs12Password: String,
+    dataIdTargetLocation: String, allowOverwrite: Boolean): HttpResponse[String] = {
 
     upload(uploadEndpointIRI, managed(dataIdFile.newInputStream), managed(pkcs12File.newInputStream),
-      pkcs12File.pathAsString, dataIdTargetLocation, allowOverwrite)
+      pkcs12File.pathAsString, pkcs12Password, dataIdTargetLocation, allowOverwrite)
   }
 
-  def upload(uploadEndpointIRI: String, dataIdBytes: Array[Byte], pkcs12File: File, dataIdTargetLocation: String,
-    allowOverwrite: Boolean): HttpResponse[String] = {
+  def upload(uploadEndpointIRI: String, dataIdBytes: Array[Byte], pkcs12File: File, pkcs12Password: String,
+    dataIdTargetLocation: String, allowOverwrite: Boolean): HttpResponse[String] = {
 
     upload(uploadEndpointIRI, managed(new ByteArrayInputStream(dataIdBytes)), managed(pkcs12File.newInputStream),
-      pkcs12File.pathAsString, dataIdTargetLocation, allowOverwrite)
+      pkcs12File.pathAsString, pkcs12Password, dataIdTargetLocation, allowOverwrite)
   }
 
   def upload(uploadEndpointIRI: String, dataIdStreamOpener: => ManagedResource[InputStream],
-    pkcs12StreamOpener: => ManagedResource[InputStream], pkcs12SourceDesc: String,
+    pkcs12StreamOpener: => ManagedResource[InputStream], pkcs12SourceDesc: String, pkcs12Password: String,
     dataIdTargetLocation: String, allowOverwrite: Boolean) = {
 
     val dataIdSize = dataIdStreamOpener acquireAndGet { is =>
@@ -57,9 +57,9 @@ object DataIdUpload extends LazyLogging {
 
     (dataIdStreamOpener and dataIdStreamOpener) apply { case (dataIdForSend, dataIdForSign) =>
 
-        val sslContext = tls.pkcsClientCertSslContext(pkcs12StreamOpener)
+        val sslContext = tls.pkcs12ClientCertSslContext(pkcs12StreamOpener, pkcs12Password)
 
-        val pkcs12 = PKCS12File.fromStream(pkcs12StreamOpener, pkcs12SourceDesc)
+        val pkcs12 = PKCS12File.fromStream(pkcs12StreamOpener, pkcs12SourceDesc, pkcs12Password)
 
         val RSAKeyPair(publicKey, privateKey) = pkcs12.rsaKeyPairs.head
 
@@ -84,7 +84,7 @@ object DataIdUpload extends LazyLogging {
         def paramsPart = MultiPart(UploadPartNames.uploadParams, "dataid.params", "application/x-www-form-urlencoded",
           encodedParamsQueryString)
 
-        val sslHttp = tls.scalajHttpWithClientCert(pkcs12StreamOpener)
+        val sslHttp = tls.scalajHttpWithClientCert(pkcs12StreamOpener, pkcs12Password)
 
         sslHttp(uploadEndpointIRI).postMulti(dataIdPart, signaturePart, paramsPart).asString
     }

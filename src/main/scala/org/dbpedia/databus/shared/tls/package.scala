@@ -30,16 +30,14 @@ import java.security.KeyStore
 
 package object tls {
 
-  def pkcsClientCertSslContext(pkcs12BundleResourceName: String): SSLContext = {
+  def pkcs12ClientCertSslContextFromResource(pkcs12BundleResourceName: String, password: String = ""): SSLContext = {
 
-    pkcsClientCertSslContext(resourceAsStream(pkcs12BundleResourceName))
+    pkcs12ClientCertSslContext(resourceAsStream(pkcs12BundleResourceName), password)
   }
 
-  def pkcsClientCertSslContext(pkcs12Data: ManagedResource[InputStream]): SSLContext = {
+  def pkcs12ClientCertSslContext(pkcs12Data: ManagedResource[InputStream], password: String = ""): SSLContext = {
 
     pkcs12Data apply { bundleStream =>
-
-      val password = ""
 
       val ks = KeyStore.getInstance("PKCS12")
       ks.load(bundleStream, password.toCharArray)
@@ -53,9 +51,9 @@ package object tls {
     }
   }
 
-  def scalajHttpWithClientCert(pkcs12Data: ManagedResource[InputStream]) = {
+  def scalajHttpWithClientCert(pkcs12Data: ManagedResource[InputStream], password: String = "") = {
 
-    val sslContext = pkcsClientCertSslContext(pkcs12Data)
+    val sslContext = pkcs12ClientCertSslContext(pkcs12Data, password)
 
     val httpOptions = Seq(
       HttpOptions.connTimeout(1000),
