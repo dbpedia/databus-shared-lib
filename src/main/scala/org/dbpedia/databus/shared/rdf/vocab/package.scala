@@ -33,6 +33,8 @@ package object vocab {
 
     def foaf = Foaf
 
+    def prov = ProvO
+
     def schemaOrg = SchemaOrg
 
     def w3cCert = W3CCert
@@ -45,6 +47,8 @@ package object vocab {
   def dcterms(implicit model: Model) = DCTerms.inModel(model)
 
   def foaf(implicit model: Model) = Foaf.inModel(model)
+
+  def prov(implicit  model: Model) = ProvO.inModel(model)
 
   def schemaOrg(implicit  model: Model) = SchemaOrg.inModel(model)
 
@@ -124,6 +128,23 @@ package object vocab {
     lazy val account = property("account")
   }
 
+  trait ProvOVocab extends RDFNamespaceVocab {
+
+    override def namespace: String = "http://www.w3.org/ns/prov#"
+
+    lazy val Activity = resource("Activity")
+    
+    lazy val Agent = resource("Agent")
+
+    lazy val Entity = resource("Entity")
+
+    lazy val wasDerivedFrom = property("wasDerivedFrom")
+
+    lazy val wasInformedBy = property("wasInformedBy")
+
+    lazy val used = property("used")
+  }
+
   trait SchemaOrgVocab extends RDFNamespaceVocab {
 
     override def namespace: String = "http://schema.org/version"
@@ -182,6 +203,17 @@ package object vocab {
     override def inModel(contextModel: Model) = {
 
       new RDFNamespaceInModel with FoafVocab {
+
+        override def model: Model = contextModel
+      }
+    }
+  }
+
+  object ProvO extends RDFNamespace with ProvOVocab {
+
+    override def inModel(contextModel: Model) = {
+
+      new RDFNamespaceInModel with ProvOVocab {
 
         override def model: Model = contextModel
       }

@@ -4,10 +4,34 @@
     <groupId>org.dbpedia.databus</groupId>
     <artifactId>databus-shared-lib</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.4</version>
-    <name>${project.artifactId}</name>
+    <version>0.2.5</version>
 
-    <url>http://maven.apache.org</url>
+    <name>DBpedia Databus Shared Library</name>
+    <description>This library bundled software components shared by several Databus tools and services.</description>
+    <url>https://github.com/dbpedia/databus-shared-lib</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Markus Ackermann</name>
+            <email>ackermann@fusionfactory.de</email>
+            <organization>DBpedia Association</organization>
+            <organizationUrl>https://dbpedia.org</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/dbpedia/databus-shared-lib.git</connection>
+        <developerConnection>scm:git:git://github.com/dbpedia/databus-shared-lib.git</developerConnection>
+        <url>https://github.com/dbpedia/databus-shared-lib/tree/master</url>
+    </scm>
+
     <properties>
         <encoding>UTF-8</encoding>
         <file.encoding>UTF-8</file.encoding>
