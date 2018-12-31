@@ -27,17 +27,18 @@ import resource.managed
 
 import scala.collection.JavaConverters._
 
-case class RSAModulusAndExponent(modulus: BigInt, exponent: BigInt) {
+case class  RSAModulusAndExponent(modulus: BigInt, exponent: BigInt) {
 
   def modulusHex = modulus.toString(16).toUpperCase
 
-  def matchAgainstWebId(webIdModel: Model, maintainerIRI: String, mavenLog: Option[Log] = None): Option[RDFNode] = {
+  def matchAgainstWebId(webIdModel: Model, webIdIRI: String, mavenLog: Option[Log] = None): Option[RDFNode] = {
 
     val w3cCert = vocab.W3CCert.inModel(webIdModel)
 
-    val maintainerRes = webIdModel.getResource(maintainerIRI)
+    val webidRes = webIdModel.getResource(webIdIRI)
 
-    managed(webIdModel.listObjectsOfProperty(maintainerRes, w3cCert.key)) apply { nodeIter =>
+    // retrieve key
+    managed(webIdModel.listObjectsOfProperty(webidRes, w3cCert.key)) apply { nodeIter =>
 
       nodeIter.asScala find { certKey =>
 
@@ -57,11 +58,12 @@ case class RSAModulusAndExponent(modulus: BigInt, exponent: BigInt) {
 
             mavenLog foreach { log =>
               if(modulusExponentFromWebId == this) {
-                log.info("Key with matching exponent and modulus found in WebID:\n" +
+                log.info("Key with matching exponent and modulus found in WebID and PKCS12 file:\n" +
                   modulusExponentFromWebId.shortenedDescription)
               } else {
-                log.info("Ingoring key with differing exponent and modulus found in WebID:\n" +
-                  modulusExponentFromWebId.shortenedDescription)
+                log.error("Key with differing exponent and modulus\n"+
+                  "found in WebID:" + modulusExponentFromWebId.shortenedDescription+"\n"+
+                  "found in file:" + modulusExponentFromWebId.shortenedDescription)
               }
             }
 
@@ -83,7 +85,7 @@ case class RSAModulusAndExponent(modulus: BigInt, exponent: BigInt) {
 
   def shortenedDescription =
     s"""
-       |modulus:  ${modulusHex.take(30)}...
+       |modulus:  ${modulusHex.take(50)}...
        |exponent: $exponent
        """.stripMargin
 }
