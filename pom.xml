@@ -4,7 +4,7 @@
     <groupId>org.dbpedia.databus</groupId>
     <artifactId>databus-shared-lib</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.5</version>
+    <version>0.2.6-SNAPSHOT</version>
 
     <name>DBpedia Databus Shared Library</name>
     <description>This library bundled software components shared by several Databus tools and services.</description>

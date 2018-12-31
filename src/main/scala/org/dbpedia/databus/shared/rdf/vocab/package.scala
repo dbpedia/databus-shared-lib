@@ -68,7 +68,9 @@ package object vocab {
     
     lazy val associatedAgent = property("associatedAgent")
 
-    lazy val bundle = property("bundle")
+    lazy val maintainer = property("maintainer")
+
+    lazy val groupId = property("groupid")
     
     lazy val compression = property("compression")
 
@@ -83,6 +85,12 @@ package object vocab {
     lazy val signature = property("signature")
 
     lazy val uncompressedByteSize = property("uncompressedByteSize")
+
+    lazy val duplicates = property("duplicates")
+
+    lazy val nonEmptyLines = property("nonEmptyLines")
+
+    lazy val sorted = property("sorted")
   }
 
   trait DcatVocab extends RDFNamespaceVocab {
