@@ -48,9 +48,9 @@ package object vocab {
 
   def foaf(implicit model: Model) = Foaf.inModel(model)
 
-  def prov(implicit  model: Model) = ProvO.inModel(model)
+  def prov(implicit model: Model) = ProvO.inModel(model)
 
-  def schemaOrg(implicit  model: Model) = SchemaOrg.inModel(model)
+  def schemaOrg(implicit model: Model) = SchemaOrg.inModel(model)
 
   def w3cCert(implicit model: Model) = W3CCert.inModel(model)
 
@@ -64,20 +64,28 @@ package object vocab {
 
     lazy val SingleFile = resource("SingleFile")
 
+    lazy val Artifact = resource("Artifact")
+
+    lazy val Group = resource("Group")
+
+    lazy val Version = resource("Version")
+
     lazy val artifact = property("artifact")
-    
+
+    lazy val version = property("version")
+
     lazy val associatedAgent = property("associatedAgent")
 
     lazy val maintainer = property("maintainer")
 
     lazy val groupId = property("groupid")
-    
+
     lazy val compression = property("compression")
 
     lazy val isDistributionOf = property("isDistributionOf")
 
     lazy val mimetype = property("mimetype")
-    
+
     lazy val preview = property("preview")
 
     lazy val sha256sum = property("sha256sum")
@@ -141,7 +149,7 @@ package object vocab {
     override def namespace: String = "http://www.w3.org/ns/prov#"
 
     lazy val Activity = resource("Activity")
-    
+
     lazy val Agent = resource("Agent")
 
     lazy val Entity = resource("Entity")
@@ -249,4 +257,5 @@ package object vocab {
       }
     }
   }
+
 }
