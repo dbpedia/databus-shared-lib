@@ -84,7 +84,12 @@ object DataIdUpload extends LazyLogging {
         def paramsPart = MultiPart(UploadPartNames.uploadParams, "dataid.params", "application/x-www-form-urlencoded",
           encodedParamsQueryString)
 
-        val sslHttp = tls.scalajHttpWithClientCert(pkcs12StreamOpener, pkcs12Password)
+        var allowUnsafeSSL=false
+        if(uploadEndpointIRI.contains("localhost")){
+          allowUnsafeSSL = true
+        }
+
+        val sslHttp = tls.scalajHttpWithClientCert(pkcs12StreamOpener, pkcs12Password, allowUnsafeSSL)
 
         sslHttp(uploadEndpointIRI).postMulti(dataIdPart, signaturePart, paramsPart).asString
     }

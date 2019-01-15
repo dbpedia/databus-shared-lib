@@ -20,13 +20,13 @@
 package org.dbpedia.databus.shared
 
 import org.dbpedia.databus.shared.helpers.resourceAsStream
-
 import javax.net.ssl.{KeyManagerFactory, SSLContext}
 import resource.ManagedResource
 import scalaj.http.{BaseHttp, HttpOptions}
-
 import java.io.InputStream
 import java.security.KeyStore
+
+import scalaj.http
 
 package object tls {
 
@@ -51,16 +51,27 @@ package object tls {
     }
   }
 
-  def scalajHttpWithClientCert(pkcs12Data: ManagedResource[InputStream], password: String = "") = {
+  def scalajHttpWithClientCert(pkcs12Data: ManagedResource[InputStream], password: String = "", allowUnsafeSSL: Boolean = false) = {
 
     val sslContext = pkcs12ClientCertSslContext(pkcs12Data, password)
 
-    val httpOptions = Seq(
+    var httpOptions = Seq(
       HttpOptions.connTimeout(1000),
       HttpOptions.readTimeout(30000),
       HttpOptions.followRedirects(false),
       HttpOptions.sslSocketFactory(sslContext.getSocketFactory),
     )
+
+    if (allowUnsafeSSL) {
+      httpOptions = Seq(
+        HttpOptions.connTimeout(1000),
+        HttpOptions.readTimeout(30000),
+        HttpOptions.followRedirects(false),
+        HttpOptions.sslSocketFactory(sslContext.getSocketFactory),
+        HttpOptions.allowUnsafeSSL
+      )
+    }
+
 
     new BaseHttp(options = httpOptions)
   }
