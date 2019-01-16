@@ -55,22 +55,12 @@ package object tls {
 
     val sslContext = pkcs12ClientCertSslContext(pkcs12Data, password)
 
-    var httpOptions = Seq(
+    val httpOptions = Seq(
       HttpOptions.connTimeout(1000),
       HttpOptions.readTimeout(30000),
       HttpOptions.followRedirects(false),
-      HttpOptions.sslSocketFactory(sslContext.getSocketFactory),
-    )
-
-    if (allowUnsafeSSL) {
-      httpOptions = Seq(
-        HttpOptions.connTimeout(1000),
-        HttpOptions.readTimeout(30000),
-        HttpOptions.followRedirects(false),
-        HttpOptions.sslSocketFactory(sslContext.getSocketFactory),
-        HttpOptions.allowUnsafeSSL
-      )
-    }
+      HttpOptions.sslSocketFactory(sslContext.getSocketFactory)
+    )++ (if(allowUnsafeSSL){Some(HttpOptions.allowUnsafeSSL)}else None)
 
 
     new BaseHttp(options = httpOptions)

@@ -33,22 +33,22 @@ import java.nio.charset.StandardCharsets
 object DataIdUpload extends LazyLogging {
 
   def upload(uploadEndpointIRI: String, dataIdFile: File, pkcs12File: File, pkcs12Password: String,
-    dataIdTargetLocation: String, allowOverwrite: Boolean): HttpResponse[String] = {
+    dataIdTargetLocation: String, allowOverwrite: Boolean, datasetIdentifier:String ): HttpResponse[String] = {
 
     upload(uploadEndpointIRI, managed(dataIdFile.newInputStream), managed(pkcs12File.newInputStream),
-      pkcs12File.pathAsString, pkcs12Password, dataIdTargetLocation, allowOverwrite)
+      pkcs12File.pathAsString, pkcs12Password, dataIdTargetLocation, allowOverwrite, datasetIdentifier)
   }
 
   def upload(uploadEndpointIRI: String, dataIdBytes: Array[Byte], pkcs12File: File, pkcs12Password: String,
-    dataIdTargetLocation: String, allowOverwrite: Boolean): HttpResponse[String] = {
+    dataIdTargetLocation: String, allowOverwrite: Boolean, datasetIdentifier:String): HttpResponse[String] = {
 
     upload(uploadEndpointIRI, managed(new ByteArrayInputStream(dataIdBytes)), managed(pkcs12File.newInputStream),
-      pkcs12File.pathAsString, pkcs12Password, dataIdTargetLocation, allowOverwrite)
+      pkcs12File.pathAsString, pkcs12Password, dataIdTargetLocation, allowOverwrite,datasetIdentifier)
   }
 
   def upload(uploadEndpointIRI: String, dataIdStreamOpener: => ManagedResource[InputStream],
     pkcs12StreamOpener: => ManagedResource[InputStream], pkcs12SourceDesc: String, pkcs12Password: String,
-    dataIdTargetLocation: String, allowOverwrite: Boolean) = {
+    dataIdTargetLocation: String, allowOverwrite: Boolean, datasetIdentifier:String) = {
 
     val dataIdSize = dataIdStreamOpener acquireAndGet { is =>
 
@@ -71,7 +71,8 @@ object DataIdUpload extends LazyLogging {
 
         val params = Map(
           UploadParams.dataIdLocation -> dataIdTargetLocation,
-          UploadParams.allowOverwrite -> true.toString
+          UploadParams.allowOverwrite -> true.toString,
+          UploadParams.datasetIdentifier -> datasetIdentifier
         )
 
         def encodedParamsQueryString = {
@@ -84,10 +85,7 @@ object DataIdUpload extends LazyLogging {
         def paramsPart = MultiPart(UploadPartNames.uploadParams, "dataid.params", "application/x-www-form-urlencoded",
           encodedParamsQueryString)
 
-        var allowUnsafeSSL=false
-        if(uploadEndpointIRI.contains("localhost")){
-          allowUnsafeSSL = true
-        }
+        val allowUnsafeSSL = uploadEndpointIRI.contains("localhost")
 
         val sslHttp = tls.scalajHttpWithClientCert(pkcs12StreamOpener, pkcs12Password, allowUnsafeSSL)
 
@@ -111,6 +109,6 @@ object DataIdUpload extends LazyLogging {
 
     val (dataIdLocation, allowOverwrite) = ("DataIdLocation", "AllowOverwrite")
 
-    val (dataIdIdentifier, dataIdVersion) = ("DataIdIdentifier", "DataIdVersion")
+    val (datasetIdentifier, dataIdVersion) = ("DatasetIdentifier", "DataIdVersion")
   }
 }
