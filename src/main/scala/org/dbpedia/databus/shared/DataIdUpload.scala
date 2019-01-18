@@ -48,7 +48,7 @@ object DataIdUpload extends LazyLogging {
 
   def upload(uploadEndpointIRI: String, dataIdStreamOpener: => ManagedResource[InputStream],
     pkcs12StreamOpener: => ManagedResource[InputStream], pkcs12SourceDesc: String, pkcs12Password: String,
-    dataIdTargetLocation: String, allowOverwrite: Boolean, datasetIdentifier:String) = {
+    dataIdTargetLocation: String, allowOverwrite: Boolean, datasetIdentifier:String): HttpResponse[String] = {
 
     val dataIdSize = dataIdStreamOpener acquireAndGet { is =>
 
@@ -88,6 +88,14 @@ object DataIdUpload extends LazyLogging {
         val allowUnsafeSSL = uploadEndpointIRI.contains("localhost")
 
         val sslHttp = tls.scalajHttpWithClientCert(pkcs12StreamOpener, pkcs12Password, allowUnsafeSSL)
+
+        logger.info(
+          s"""Uploading to ${uploadEndpointIRI} with Multipart:
+             |Part 1: DataId File from ${dataIdTargetLocation}
+             |Part 2: Signature of above DataID file with key from PKCS12
+             |Part 3: Parameters:
+             |${params.mkString("\n")}
+           """.stripMargin)
 
         sslHttp(uploadEndpointIRI).postMulti(dataIdPart, signaturePart, paramsPart).asString
     }
