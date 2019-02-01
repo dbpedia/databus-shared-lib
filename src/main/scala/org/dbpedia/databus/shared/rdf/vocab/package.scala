@@ -80,7 +80,7 @@ package object vocab {
 
     lazy val maintainer = property("maintainer")
 
-    lazy val groupId = property("groupid")
+    lazy val groupId = property("group")
 
     lazy val compression = property("compression")
 
