@@ -44,7 +44,7 @@ package object vocab {
 
   def dataid(implicit model: Model) = DataId.inModel(model)
 
-  def dataidcv(implicit model: Model) = DataId.inModel(model)
+  def dataidcv(implicit model: Model) = DataIdCV.inModel(model)
 
   def dcat(implicit model: Model) = Dcat.inModel(model)
 
