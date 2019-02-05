@@ -27,6 +27,8 @@ package object vocab {
 
     def dataid = DataId
 
+    def dataidcv = DataIdCV
+
     def dcat = Dcat
 
     def dcterms = DCTerms
@@ -42,6 +44,8 @@ package object vocab {
 
   def dataid(implicit model: Model) = DataId.inModel(model)
 
+  def dataidcv(implicit model: Model) = DataId.inModel(model)
+
   def dcat(implicit model: Model) = Dcat.inModel(model)
 
   def dcterms(implicit model: Model) = DCTerms.inModel(model)
@@ -53,6 +57,11 @@ package object vocab {
   def schemaOrg(implicit model: Model) = SchemaOrg.inModel(model)
 
   def w3cCert(implicit model: Model) = W3CCert.inModel(model)
+
+  trait DataIdCVVocab extends RDFNamespaceVocab {
+
+    def namespace = "http://dataid.dbpedia.org/ns/cv#"
+  }
 
   trait DataIdVocab extends RDFNamespaceVocab {
 
@@ -184,6 +193,17 @@ package object vocab {
   }
 
   object DataId extends RDFNamespace with DataIdVocab {
+
+    override def inModel(contextModel: Model) = {
+
+      new RDFNamespaceInModel with DataIdVocab {
+
+        override def model: Model = contextModel
+      }
+    }
+  }
+
+  object DataIdCV extends RDFNamespace with DataIdVocab {
 
     override def inModel(contextModel: Model) = {
 
