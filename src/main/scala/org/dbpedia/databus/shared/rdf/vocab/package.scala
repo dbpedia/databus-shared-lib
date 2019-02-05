@@ -81,6 +81,10 @@ package object vocab {
 
     lazy val artifact = property("artifact")
 
+    lazy val account = property("account")
+
+    lazy val contentVariant = property("contentVariant")
+
     lazy val version = property("version")
 
     lazy val changelog = property("changelog")
@@ -92,6 +96,7 @@ package object vocab {
     lazy val group = property("group")
 
     lazy val compression = property("compression")
+    lazy val formatExtension = property("formatExtension")
 
     lazy val isDistributionOf = property("isDistributionOf")
 
@@ -203,11 +208,11 @@ package object vocab {
     }
   }
 
-  object DataIdCV extends RDFNamespace with DataIdVocab {
+  object DataIdCV extends RDFNamespace with DataIdCVVocab {
 
     override def inModel(contextModel: Model) = {
 
-      new RDFNamespaceInModel with DataIdVocab {
+      new RDFNamespaceInModel with DataIdCVVocab {
 
         override def model: Model = contextModel
       }
