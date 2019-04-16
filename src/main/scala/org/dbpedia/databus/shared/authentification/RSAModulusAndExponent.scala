@@ -45,7 +45,6 @@ case class  RSAModulusAndExponent(modulus: BigInt, exponent: BigInt) {
         val exponentOpt = Option(certKey.asResource().getProperty(w3cCert.exponent))
           .map(stmt => BigInt(stmt.getObject.asLiteral().getLexicalForm))
 
-
         val modulusOpt = Option(certKey.asResource().getProperty(w3cCert.modulus))
           .map(stmt => BigInt(stmt.getObject.asLiteral.getLexicalForm, 16))
 
@@ -62,8 +61,8 @@ case class  RSAModulusAndExponent(modulus: BigInt, exponent: BigInt) {
                   modulusExponentFromWebId.shortenedDescription)
               } else {
                 log.error("Key with differing exponent and modulus\n"+
-                  "found in WebID:" + modulusExponentFromWebId.shortenedDescription+"\n"+
-                  "found in file:" + modulusExponentFromWebId.shortenedDescription)
+                  "found in WebID:" + modulusExponentFromWebId.fullDescription+"\n"+
+                  "found in file:" + this.fullDescription)
               }
             }
 
@@ -85,7 +84,13 @@ case class  RSAModulusAndExponent(modulus: BigInt, exponent: BigInt) {
 
   def shortenedDescription =
     s"""
-       |modulus:  ${modulusHex.take(50)}...
+       |modulus:  $modulusHex
        |exponent: $exponent
        """.stripMargin
+  def fullDescription =
+    s"""
+       |modulus:  $modulusHex
+       |exponent: $exponent
+       """.stripMargin
+
 }
