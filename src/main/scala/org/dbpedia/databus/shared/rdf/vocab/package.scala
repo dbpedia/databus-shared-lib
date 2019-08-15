@@ -95,6 +95,8 @@ package object vocab {
 
     lazy val group = property("group")
 
+    lazy val groupdocu = property("groupdocu")
+
     lazy val compression = property("compression")
 
     lazy val formatExtension = property("formatExtension")
