@@ -87,6 +87,8 @@ package object vocab {
 
     lazy val version = property("version")
 
+    lazy val file = property("file")
+
     lazy val changelog = property("changelog")
 
     lazy val associatedAgent = property("associatedAgent")
