@@ -29,6 +29,8 @@ package object vocab {
 
     def dataidcv = DataIdCV
 
+    def dataidDebug = DataIdDebug
+
     def dcat = Dcat
 
     def dcterms = DCTerms
@@ -45,6 +47,8 @@ package object vocab {
   def dataid(implicit model: Model) = DataId.inModel(model)
 
   def dataidcv(implicit model: Model) = DataIdCV.inModel(model)
+
+  def dataiddebug(implicit model: Model) = DataIdDebug.inModel(model)
 
   def dcat(implicit model: Model) = Dcat.inModel(model)
 
@@ -63,9 +67,29 @@ package object vocab {
     def namespace = "http://dataid.dbpedia.org/ns/cv#"
   }
 
+  trait DataIdDebugVocab extends RDFNamespaceVocab {
+
+    def namespace = "http://dataid.dbpedia.org/ns/debug.ttl#"
+
+    lazy val issueTracker = property("issueTracker")
+
+    lazy val feedbackChannel = property("feedbackChannel")
+
+    lazy val codeReference = property("codeReference")
+
+    lazy val documentationLocation = property("documentationLocation")
+
+    lazy val changelog = property("changelog")
+
+  }
+
   trait DataIdVocab extends RDFNamespaceVocab {
 
     def namespace = "http://dataid.dbpedia.org/ns/core#"
+
+    /**
+      * Core classes
+      */
 
     lazy val DataId = resource("DataId")
 
@@ -79,22 +103,17 @@ package object vocab {
 
     lazy val Version = resource("Version")
 
-    lazy val artifact = property("artifact")
-
-    lazy val account = property("account")
-
-    lazy val contentVariant = property("contentVariant")
+    /**
+      * core properties
+      */
 
     lazy val version = property("version")
 
     lazy val file = property("file")
 
-    lazy val issueTracker = property("issueTracker")
-    lazy val feedbackChannel = property("feedbackChannel")
-    lazy val codeReference = property("codeReference")
-    lazy val documentationLocation = property("documentationLocation")
+    lazy val artifact = property("artifact")
 
-    lazy val changelog = property("changelog")
+    lazy val account = property("account")
 
     lazy val associatedAgent = property("associatedAgent")
 
@@ -102,15 +121,27 @@ package object vocab {
 
     lazy val group = property("group")
 
+    //todo refactor
     lazy val groupdocu = property("groupdocu")
+
+    lazy val isDistributionOf = property("isDistributionOf")
+
+
+
+
+
+
+    /**
+      * Basic parameters for files
+      */
+
+    lazy val contentVariant = property("contentVariant")
+
+    lazy val mimetype = property("mimetype")
 
     lazy val compression = property("compression")
 
     lazy val formatExtension = property("formatExtension")
-
-    lazy val isDistributionOf = property("isDistributionOf")
-
-    lazy val mimetype = property("mimetype")
 
     lazy val preview = property("preview")
 
@@ -223,6 +254,17 @@ package object vocab {
     override def inModel(contextModel: Model) = {
 
       new RDFNamespaceInModel with DataIdCVVocab {
+
+        override def model: Model = contextModel
+      }
+    }
+  }
+
+  object DataIdDebug extends RDFNamespace with DataIdDebugVocab {
+
+    override def inModel(contextModel: Model) = {
+
+      new RDFNamespaceInModel with DataIdDebugVocab {
 
         override def model: Model = contextModel
       }
