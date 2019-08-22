@@ -259,7 +259,7 @@ package object vocab {
       }
     }
   }
-
+ 
   object DataIdDebug extends RDFNamespace with DataIdDebugVocab {
 
     override def inModel(contextModel: Model) = {
