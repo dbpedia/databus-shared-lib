@@ -57,7 +57,7 @@ package object tls {
 
     val httpOptions = Seq(
       HttpOptions.connTimeout(1000),
-      HttpOptions.readTimeout(30000),
+      HttpOptions.readTimeout(300000),
       HttpOptions.followRedirects(false),
       HttpOptions.sslSocketFactory(sslContext.getSocketFactory)
     )++ (if(allowUnsafeSSL){Some(HttpOptions.allowUnsafeSSL)}else None)

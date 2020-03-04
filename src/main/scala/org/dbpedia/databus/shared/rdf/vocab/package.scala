@@ -75,6 +75,8 @@ package object vocab {
 
     lazy val feedbackChannel = property("feedbackChannel")
 
+    lazy val gitCommitLink = property("gitCommitLink")
+
     lazy val codeReference = property("codeReference")
 
     lazy val documentationLocation = property("documentationLocation")
@@ -259,7 +261,7 @@ package object vocab {
       }
     }
   }
- 
+
   object DataIdDebug extends RDFNamespace with DataIdDebugVocab {
 
     override def inModel(contextModel: Model) = {
