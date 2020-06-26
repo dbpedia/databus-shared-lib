@@ -38,7 +38,8 @@ object AccountHelpers {
   def update: Model = {
     ModelFactory.createDefaultModel.tap {
       accountsModel =>
-        accountsModel.read("https://raw.githubusercontent.com/dbpedia/accounts/master/accounts.ttl", TURTLE.getName)
+        //accountsModel.read("https://raw.githubusercontent.com/dbpedia/accounts/master/accounts.ttl", TURTLE.getName)
+        accountsModel.read("https://databus.dbpedia.org/system/api/accounts", TURTLE.getName)
     }
   }
 
